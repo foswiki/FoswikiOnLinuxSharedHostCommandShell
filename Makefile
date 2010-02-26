@@ -3,7 +3,8 @@ INSTALLER_SCRIPT_REV = 1
 
 default : foswiki-install-shared-hosting.pl
 
-release : Foswiki-1.0.9-SharedHosting-$(INSTALLER_SCRIPT_REV).tgz Foswiki-1.0.9-SharedHosting-$(INSTALLER_SCRIPT_REV).tgz.md5
+RELEASE_FILES = Foswiki-1.0.9-SharedHosting-$(INSTALLER_SCRIPT_REV).tgz Foswiki-1.0.9-SharedHosting-$(INSTALLER_SCRIPT_REV).tgz.md5
+release : $(RELEASE_FILES)
 
 ALL : release
 
@@ -37,7 +38,7 @@ FastCGIEngineContrib.tgz :
 #
 
 clean :
-	-rm *~ Foswiki-1.0.9-SharedHosting.tgz Foswiki-1.0.9-SharedHosting.tgz.md5 foswiki-install-shared-hosting.pl Foswiki-1.0.9.tgz.uuencode FastCGIEngineContrib.tgz.uuencode 2>/dev/null
+	-rm *~ $(RELEASE_FILES) foswiki-install-shared-hosting.pl Foswiki-1.0.9.tgz.uuencode FastCGIEngineContrib.tgz.uuencode 2>/dev/null
 
 realclean : clean
 	-rm Foswiki-1.0.9.tgz FastCGIEngineContrib.tgz 2>/dev/null
