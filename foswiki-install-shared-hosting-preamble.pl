@@ -52,7 +52,7 @@ if ( $opts->{hostname} ) {
     DEBUG( "DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]" );
     # prepend "www." if we're not in a subdomain (eg, example.com instead of wiki.example.com or www.example.com)
     if ( $#{ [split /\./, $DefaultUrlHost]} == 1 ) {
-	print "Domain name: \"www.\" automatically prepend.  Although you aren't required to locate the wiki in a subdomain, doing so will allow you to later\ncreate another subdomain to serve the static content from pub, improving page load performance.\n(see http://developer.yahoo.com/performance/rules.html#cookie_free)\n";
+	print "Domain name: \"www.\" automatically prepended.  Although you aren't required to locate the wiki in a subdomain, doing so will allow you to later\ncreate another subdomain to serve the static content from pub, improving page load performance.\n(see http://developer.yahoo.com/performance/rules.html#cookie_free)\n";
 	$DefaultUrlHost = "www.$DefaultUrlHost";
     }
     DEBUG( "DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]" );
@@ -341,12 +341,19 @@ sub get_basic_credentials {
 # TODO: (see also http://foswiki.org/Development/FoswikiOnLinuxSharedHostCommandShell)
 #   * support ShortURLs
 #   * perform the initial configure save via this script (STUCK)
+#   * use Apache::Htpasswd (which also means i don't have to look for htpasswd or htpasswd2)
 #   * use WWW::Mechanize::Foswiki to drive configure
 #   * provide CPAN installation support
 #   * add "Cache-Control: private" and "KeepAlive on" (http://www.die.net/musings/page_load_time/) to pub/.htaccess ?
 #   * ability to disable mod_deflate support on pub (better to serve the raw file instead of trying to compress it on an overloaded shared host?)
 #   * test and support (better) https
 #   * trivial browser frontend for ftp installation
+################################################################################
+# NOTES:
+#   * http://cgipan.cvs.sourceforge.net/cgipan/cgipan/cgipan.cgi?view=markup
+#   * http://search.cpan.org/dist/Shipwright/lib/Shipwright.pm
+#   * http://search.cpan.org/dist/pip/lib/pip.pm
+#   * http://search.cpan.org/dist/PAR/
 ################################################################################
 ## EOF - foswiki-install-shared-hosting-preamble.pl
 ################################################################################
