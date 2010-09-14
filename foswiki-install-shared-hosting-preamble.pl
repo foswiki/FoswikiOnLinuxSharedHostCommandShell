@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # Copyright (c) 2010, Will Norris.  Licensed under the GPLv2.
-# Version 1.0.0 - 9 Feb 2010
+# Version 1.0.10-1 - 13 Sep 2010
 use strict;
 use warnings;
 use Data::Dumper qw( Dumper );

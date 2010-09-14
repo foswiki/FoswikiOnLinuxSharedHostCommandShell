@@ -1,7 +1,7 @@
 
 INSTALLER_SCRIPT_REV = 1
 
-FOSWIKI_RELEASE = 1.0.9
+FOSWIKI_RELEASE = 1.0.10
 
 FOSWIKI_BASE_FILENAME = Foswiki-$(FOSWIKI_RELEASE)
 INSTALLER_SCRIPT_FILENAME = $(FOSWIKI_BASE_FILENAME)-SharedHosting-$(INSTALLER_SCRIPT_REV).tgz
@@ -35,7 +35,7 @@ FastCGIEngineContrib.tgz.uuencode : FastCGIEngineContrib.tgz
 	perl -Ilib/CPAN/lib/ puuencode FastCGIEngineContrib.tgz >FastCGIEngineContrib.tgz.uuencode
 
 $(FOSWIKI_BASE_FILENAME).tgz :
-	wget 'http://sourceforge.net/projects/foswiki/files/foswiki/$(FOSWIKI_BASE_FILENAME).tgz'
+	wget -O $(FOSWIKI_BASE_FILENAME).tgz 'http://sourceforge.net/projects/foswiki/files/foswiki/$(FOSWIKI_RELEASE)/$(FOSWIKI_BASE_FILENAME).tgz/download'
 
 FastCGIEngineContrib.tgz :
 	wget 'http://foswiki.org/pub/Extensions/FastCGIEngineContrib/FastCGIEngineContrib.tgz'
