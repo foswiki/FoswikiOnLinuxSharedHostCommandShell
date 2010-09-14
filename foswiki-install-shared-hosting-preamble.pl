@@ -127,7 +127,7 @@ my $htpasswd_file = "$foswiki_root/data/.htpasswd";
 unless ( -e $htpasswd_file ) {
     print "Creating data/.htpasswd and setting the password to access configure\n";
 
-    print "A secure password for configure (access and save) has been generated for you: $password\n";
+    print "A secure password for configure (access and save) has been generated for you: >>>>> $password <<<<<\n";
     system( htpasswd => '-b', '-c' => $htpasswd_file, $Administrators, $password );
     # TODO: use Apache::Htpasswd
     # my $htpasswd = new Apache::Htpasswd( $htpasswd_file );
