@@ -175,8 +175,8 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
     # SMELL: test for error from tar
 
     my $fastcgi = <<'__FASTCGI__';
-<ifmodule mod_fastcgi.c>
-    SetHandler fastcgi-script
+<ifmodule mod_fcgid.c>
+    SetHandler fcgid-script
     RewriteEngine on
     RewriteCond %{REQUEST_URI} !/configure
     RewriteCond %{REQUEST_URI} !/foswiki.fcgi
