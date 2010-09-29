@@ -23,7 +23,7 @@ foswiki-install-shared-hosting.pl : foswiki-install-shared-hosting-preamble.pl $
 	cat foswiki-install-shared-hosting-preamble.pl $(CPAN_LIBS) >foswiki-install-shared-hosting.pl
 	echo __END__ >>foswiki-install-shared-hosting.pl
 	cat $(FOSWIKI_BASE_FILENAME).tgz.uuencode FastCGIEngineContrib.tgz.uuencode Item9699Contrib.tgz.uuencode >>foswiki-install-shared-hosting.pl
-	chmod +x foswiki-install-shared-hosting.pl
+	chmod -x foswiki-install-shared-hosting.pl
 
 $(INSTALLER_SCRIPT_FILENAME).md5 : $(INSTALLER_SCRIPT_FILENAME)
 	md5sum $(INSTALLER_SCRIPT_FILENAME) >$(INSTALLER_SCRIPT_FILENAME).md5
