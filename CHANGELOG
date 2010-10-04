@@ -1,0 +1,13 @@
+CHANGELOG
+
+2010-10-03  1.0.10-3
+   * Improve regex for Expires header - match jpeg as well as jpg. -- Foswiki:Main.WillNorris; match the gz compressed versions of css and js -- Foswiki:Main.GeorgeClark
+
+2010-09-29  1.0.10.-2
+   * Switched from mod_fastci to mod_fcgid
+
+2010-09-29  1.0.10.-1
+   * Updated to Foswiki 1.0.10
+
+2009-02-09  1.0.9-1
+   * Initial release (Foswiki 1.0.9)

@@ -206,7 +206,7 @@ unless ( -e "$foswiki_root/pub/.htaccess" ) {
 
     my $compress = <<'__MOD_DEFLATE__';
 <ifmodule mod_expires.c>
-  <filesmatch "\.(jpg|gif|png|css|js|ico)$">
+  <filesmatch "\.(jpe?g|gif|png|css(\.gz)?|js(\.gz)?|ico)$">
        ExpiresActive on
        ExpiresDefault "access plus 11 days"
    </filesmatch>
