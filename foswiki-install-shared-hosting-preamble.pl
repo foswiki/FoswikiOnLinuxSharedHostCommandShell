@@ -94,7 +94,7 @@ my $ScriptUrlPath = "$foswiki_url/bin";
 # extract and uudecode the embedded files, make available by index and name
 my $data = join( '', <main::DATA> );
 my @archive = ( $data =~ /(begin 0?\d{3}.*?end)/gs );		# SMELL: regex could be tighter
-#die "wrong number of archive (" . scalar(@archive) . "); should be 3" if scalar @archive != 3;
+#die "wrong number of archive (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
 my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# make accessible via hash keyed by 'name'
 
 ################################################################################
