@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # Copyright (c) 2010, Will Norris.  Licensed under the GPLv2.
-# Version 1.0.10-1 - 13 Sep 2010
+# Version 1.1.0-1 - 19 Oct 2010
 use strict;
 use warnings;
 use Data::Dumper qw( Dumper );
@@ -32,7 +32,7 @@ DEBUG( "foswiki_root=[$foswiki_root]" );
 # welcome banner
 unless ( $opts->{hostname} and $opts->{email} ) {
     print <<__WELCOME__;
-This script will install Foswiki v1.0.9 to "$pwd"
+This script will install Foswiki v1.1.0 to "$pwd"
 The following information will be needed:
 1. domain name
    * (optional) a separate subdomain for pub
@@ -94,7 +94,7 @@ my $ScriptUrlPath = "$foswiki_url/bin";
 # extract and uudecode the embedded files, make available by index and name
 my $data = join( '', <main::DATA> );
 my @archive = ( $data =~ /(begin 0?\d{3}.*?end)/gs );		# SMELL: regex could be tighter
-#die "wrong number of archive (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
+#die "wrong number of archives (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
 my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# make accessible via hash keyed by 'name'
 
 ################################################################################
@@ -107,13 +107,6 @@ unless ( -e "$foswiki_root/bin/view" ) {
     close TAR;
     # SMELL: test for error from tar
 }
-
-my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'Item9699Contrib.tgz'} );
-    VERBOSE( "Decompressing Item9699Contrib" );
-    open( TAR, '|-', tar => '-xz' );
-    print TAR $uudecoded_string;
-    close TAR;
-    # SMELL: test for error from tar
 
 ################################################################################
 # bin/LocalLib.cfg
