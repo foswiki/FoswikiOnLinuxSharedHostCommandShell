@@ -309,26 +309,9 @@ __LIB_LOCALSITE_CFG__
 # COMPLETION!
 my $configure = "http://$DefaultUrlHost$foswiki_url/bin/configure";
 
-if ( 0 ) {	# sadly, i haven't gotten this working
-	     use WWW::Mechanize;
-	     use MIME::Base64;
-	     my $mech = WWW::Mechanize->new( agent => $0, cookie_jar => {}, autocheck => 1 );
-	     $mech->credentials( $Administrators => $password );
-#?	     $mech->add_header( Authorization => 'Basic ' . MIME::Base64::encode( $Administrators . ':' . $password ) );
-	     
-	     $mech->get( $configure );
-	     $mech->submit_form( form_name => 'update' );
-	     die unless $mech->success;
-	     warn Dumper( $mech->forms );
-	     # could set the password via configure the first time (newCfgP and confCfgP), but it's safer to do it manually 
-	     # above to prevent leaving the wiki unprotected in case something goes wrong withe this configure process
-	     $mech->submit_form( with_fields => { cfgAccess => $password } );
-	     die unless $mech->success;
-	     print "\nWiki installation and configuration completed.  Your wiki is available at http://$DefaultUrlHost$foswiki_url/bin/view\nEnjoy!\n";
-	 } else {
-	     print "\nYou *MUST* perform a *SAVE* at $configure to complete the installation of your wiki.\nEnjoy!\n";
-#	     system( lynx => $configure );
-	 }
+print "\nYou *MUST* perform a *SAVE* at $configure to complete the installation of your wiki.\nEnjoy!\n";
+system( lynx => $configure );
+
 exit 0;
 
 ################################################################################
@@ -360,24 +343,6 @@ sub VERBOSE {
 sub DEBUG {
     print @_, "\n" if $opts->{debug};
 }
-
-################################################################################
-package ConfigureMech;
-use WWW::Mechanize;
-
-use vars qw(@ISA);
-@ISA = qw(WWW::Mechanize);
-
-sub new {
-    my $self = WWW::Mechanize::new(@_);
-    $self;
-}
-
-sub get_basic_credentials {
-    my ($self, $realm, $uri) = @_;
-    return( $Administrators, $password );
-}
-1;
 
 ################################################################################
 # TODO: (see also http://foswiki.org/Development/FoswikiOnLinuxSharedHostCommandShell)
