@@ -101,13 +101,36 @@ my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# mak
 ################################################################################
 # extract the foswiki distribution
 unless ( -e "$foswiki_root/bin/view" ) {
-    my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive[0] );	# use first slot which should contain a Foswiki distribution
-    $archive[0] = undef;
-    VERBOSE( "Decompressing Foswiki" );
-    open( TAR, '|-', tar => '-xz', '--strip'=>'1' );
-    print TAR $uudecoded_string;
-    close TAR;
+    my $foswiki_distribution = $archive[0];
+
+    if ( 0 ) {
+	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $foswiki_distribution );	# use first slot which should contain a Foswiki distribution
+	DEBUG( "Foswiki uudecoded" );
+	$foswiki_distribution = $archive[0] = undef;
+
+	VERBOSE( "Decompressing Foswiki" );
+	open( TAR, '>', 'Foswiki.tgz' ) or die $!;
+	print TAR $uudecoded_string;
+	close TAR;
+	$uudecoded_string = undef;
+	
+    } else {
+
+	open( UU, '>', 'Foswiki.tgz.uuencode' ) or die $!;
+	print UU $foswiki_distribution, "\n";
+	close UU;
+	$foswiki_distribution = $archive[0] = undef;  @archive = ();
+	DEBUG( "Foswiki uudecoded" );
+
+	system( uudecode => '-o'=>'Foswiki.tgz' => 'Foswiki.tgz.uuencode' );
+	# SMELL: test for error from uudecode
+	unlink 'Foswiki.tgz.uuencode';
+    }
+
+    system( tar => '--strip'=>'1' => '-xzf' => 'Foswiki.tgz' );
     # SMELL: test for error from tar
+    unlink 'Foswiki.tgz';
+
 }
 
 ################################################################################
@@ -162,13 +185,29 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
     system( qq{sed -i -e 's|\{ScriptUrlPath\}|$ScriptUrlPath|g' $foswiki_root/bin/.htaccess} );
     system( qq{sed -i -e 's|\{Administrators\}|$Administrators|g' $foswiki_root/bin/.htaccess} );
 
-    my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
-    $archive{'FastCGIEngineContrib.tgz'} = undef;
-    VERBOSE( "Decompressing FastCGIEngineContrib" );
-    open( TAR, '|-', tar => '-xz' );
-    print TAR $uudecoded_string;
-    close TAR;
-    # SMELL: test for error from tar
+    if ( 0 ) {
+	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
+	$archive{'FastCGIEngineContrib.tgz'} = undef;
+	VERBOSE( "Decompressing FastCGIEngineContrib" );
+	open( TAR, '|-', tar => '-xz' );
+	print TAR $uudecoded_string;
+	close TAR;
+	# SMELL: test for error from tar
+    } else {
+	open( UU, '>', 'FastCGIEngineContrib.tgz.uuencode' ) or die $!;
+	print UU $archive{'FastCGIEngineContrib.tgz'}, "\n";
+	close UU;
+	$archive{'FastCGIEngineContrib.tgz'} = undef;
+	DEBUG( "contrib uudecoded" );
+
+	system( uudecode => '-o'=>'FastCGIEngineContrib.tgz' => 'FastCGIEngineContrib.tgz.uuencode' );
+	# SMELL: test for error from uudecode
+	unlink 'FastCGIEngineContrib.tgz.uuencode';
+
+	system( tar => '-xzf' => 'FastCGIEngineContrib.tgz' );
+	# SMELL: test for error from tar
+	unlink 'FastCGIEngineContrib.tgz';
+    }
 
     my $fastcgi = <<'__FASTCGI__';
 <ifmodule mod_fcgid.c>

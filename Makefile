@@ -16,7 +16,7 @@ ALL : release
 $(INSTALLER_SCRIPT_FILENAME) : foswiki-install-shared-hosting.pl
 	tar czvf $(INSTALLER_SCRIPT_FILENAME) foswiki-install-shared-hosting.pl
 
-CPAN_LIBS = lib/CPAN/lib/Convert/UU.pm lib/CPAN/lib/Apache/Htpasswd.pm
+CPAN_LIBS = lib/CPAN/lib/Apache/Htpasswd.pm
 
 # NOTE: *always* list a Foswiki distribution as the first data file in the list of uuencoded attachments.  the installer installs the main distribution by its slot position (0)
 foswiki-install-shared-hosting.pl : foswiki-install-shared-hosting-preamble.pl $(CPAN_LIBS) $(FOSWIKI_BASE_FILENAME).tgz.uuencode FastCGIEngineContrib.tgz.uuencode 
