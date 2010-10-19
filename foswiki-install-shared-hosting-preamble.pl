@@ -94,13 +94,16 @@ my $ScriptUrlPath = "$foswiki_url/bin";
 # extract and uudecode the embedded files, make available by index and name
 my $data = join( '', <main::DATA> );
 my @archive = ( $data =~ /(begin 0?\d{3}.*?end)/gs );		# SMELL: regex could be tighter
+$data = undef;
 #die "wrong number of archives (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
 my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# make accessible via hash keyed by 'name'
+@archive = ();
 
 ################################################################################
 # extract the foswiki distribution
 unless ( -e "$foswiki_root/bin/view" ) {
     my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive[0] );	# use first slot which should contain a Foswiki distribution
+    $archive[0] = undef;
     VERBOSE( "Decompressing Foswiki" );
     open( TAR, '|-', tar => '-xz', '--strip'=>'1' );
     print TAR $uudecoded_string;
@@ -161,6 +164,7 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
     system( qq{sed -i -e 's|\{Administrators\}|$Administrators|g' $foswiki_root/bin/.htaccess} );
 
     my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
+    $archive{'FastCGIEngineContrib.tgz'} = undef;
     VERBOSE( "Decompressing FastCGIEngineContrib" );
     open( TAR, '|-', tar => '-xz' );
     print TAR $uudecoded_string;
