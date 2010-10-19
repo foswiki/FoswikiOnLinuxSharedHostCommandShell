@@ -97,7 +97,6 @@ my @archive = ( $data =~ /(begin 0?\d{3}.*?end)/gs );		# SMELL: regex could be t
 $data = undef;
 #die "wrong number of archives (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
 my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# make accessible via hash keyed by 'name'
-@archive = ();
 
 ################################################################################
 # extract the foswiki distribution
@@ -343,6 +342,8 @@ sub get_basic_credentials {
 
 ################################################################################
 # TODO: (see also http://foswiki.org/Development/FoswikiOnLinuxSharedHostCommandShell)
+#   * check for tar/sed/etc. on path?
+#      * remove sed dependency?
 #   * support ShortURLs
 #   * perform the initial configure save via this script (STUCK)
 #   * use Apache::Htpasswd (which also means i don't have to look for htpasswd or htpasswd2)
@@ -358,6 +359,10 @@ sub get_basic_credentials {
 #   * http://search.cpan.org/dist/Shipwright/lib/Shipwright.pm
 #   * http://search.cpan.org/dist/pip/lib/pip.pm
 #   * http://search.cpan.org/dist/PAR/
+#   * http://home.org.au/Blog/BlogEntry2005x01x12x20x07
+#   * http://home.org.au/Blog/BlogEntry2005x03x12x16x44
+#   * http://home.org.au/Blog/BlogEntry2006x10x24x16x16
+#   * http://home.org.au/Blog/BlogEntry2006x11x19x13x39
 ################################################################################
 ## EOF - foswiki-install-shared-hosting-preamble.pl
 ################################################################################
