@@ -284,6 +284,9 @@ unless ( -e "$foswiki_root/lib/LocalSite.cfg" ) {
         chomp( $WikiWebMasterEmail = <STDIN> );
     }
 
+# lib/LocalSite.cfg
+Autoconf( $foswiki_root );
+
 my $libLocalSiteCfg = <<__LIB_LOCALSITE_CFG__;
 # Local site settings for Foswiki. This file is managed by the 'configure'
 # CGI script, though you can also make (careful!) manual changes with a
@@ -305,21 +308,56 @@ my $libLocalSiteCfg = <<__LIB_LOCALSITE_CFG__;
 1;
 __LIB_LOCALSITE_CFG__
 
-    open( FH, '>', "$foswiki_root/lib/LocalSite.cfg" ) or die $!;
+    open( FH, '>>', "$foswiki_root/lib/LocalSite.cfg" ) or die $!;
     print FH $libLocalSiteCfg;
     close( FH );
 }
 
 ################################################################################
 # COMPLETION!
-my $configure = "http://$DefaultUrlHost$foswiki_url/bin/configure";
-
-print "\nYou *MUST* perform a *SAVE* at $configure to complete the installation of your wiki.\nEnjoy!\n";
-#system( lynx => $configure );
 
 exit 0;
 
 ################################################################################
+################################################################################
+
+sub error {
+    print @_;
+}
+
+sub Autoconf {
+    my ( $foswikidir ) = @_;
+    my $force = 1;
+
+    my $localSiteCfg = $foswikidir . '/lib/LocalSite.cfg';
+    if ( $force || ( !-e $localSiteCfg ) ) {
+        open( my $f, '<', "$foswikidir/lib/Foswiki.spec" )
+          or die "Cannot autoconf: $!";
+        local $/ = undef;
+        my $localsite = <$f>;
+        close $f;
+
+     #assume that the commented out settings (DataDir etc) are only on one line.
+        $localsite =~ s/^# (\$Foswiki::cfg[^\n]*)/$1/mg;
+        $localsite =~ s/^#[^\n]*\n+//mg;
+        $localsite =~ s/\n\s+/\n/sg;
+        $localsite =~ s/__END__//g;
+        $localsite =~ s|/home/httpd/foswiki|$foswikidir|g;
+
+        if ( open( my $ls, '>', $localSiteCfg ) ) {
+            print $ls $localsite;
+            close $ls;
+            #warn "wrote simple config to $localSiteCfg\n\n";
+        }
+        else {
+            error "failed to write to $localSiteCfg\n\n";
+        }
+    }
+    else {
+        error "won't overwrite $localSiteCfg without -force\n\n";
+    }
+}
+
 ################################################################################
 
 # same as standard settings for http://goodpassword.com
