@@ -103,12 +103,12 @@ my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# mak
 unless ( -e "$foswiki_root/bin/view" ) {
     my $foswiki_distribution = $archive[0];
 
+    VERBOSE( "Decompressing Foswiki" );
     if ( 0 ) {
 	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $foswiki_distribution );	# use first slot which should contain a Foswiki distribution
 	DEBUG( "Foswiki uudecoded" );
 	$foswiki_distribution = $archive[0] = undef;
 
-	VERBOSE( "Decompressing Foswiki" );
 	open( TAR, '>', 'Foswiki.tgz' ) or die $!;
 	print TAR $uudecoded_string;
 	close TAR;
@@ -116,13 +116,15 @@ unless ( -e "$foswiki_root/bin/view" ) {
 	
     } else {
 
+	DEBUG( "saving Foswiki distribution tgz" );
 	open( UU, '>', 'Foswiki.tgz.uuencode' ) or die $!;
 	print UU $foswiki_distribution, "\n";
 	close UU;
 	$foswiki_distribution = $archive[0] = undef;  @archive = ();
-	DEBUG( "Foswiki uudecoded" );
 
+	DEBUG( "uudecodeding Foswiki" );
 	system( uudecode => '-o'=>'Foswiki.tgz' => 'Foswiki.tgz.uuencode' );
+	DEBUG( "Foswiki uudecoded" );
 	# SMELL: test for error from uudecode
 	unlink 'Foswiki.tgz.uuencode';
     }
@@ -185,10 +187,10 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
     system( qq{sed -i -e 's|\{ScriptUrlPath\}|$ScriptUrlPath|g' $foswiki_root/bin/.htaccess} );
     system( qq{sed -i -e 's|\{Administrators\}|$Administrators|g' $foswiki_root/bin/.htaccess} );
 
+    VERBOSE( "Decompressing FastCGIEngineContrib" );
     if ( 0 ) {
 	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
 	$archive{'FastCGIEngineContrib.tgz'} = undef;
-	VERBOSE( "Decompressing FastCGIEngineContrib" );
 	open( TAR, '|-', tar => '-xz' );
 	print TAR $uudecoded_string;
 	close TAR;
@@ -198,9 +200,10 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
 	print UU $archive{'FastCGIEngineContrib.tgz'}, "\n";
 	close UU;
 	$archive{'FastCGIEngineContrib.tgz'} = undef;
-	DEBUG( "contrib uudecoded" );
 
+	DEBUG( "uudecodeding contrib" );
 	system( uudecode => '-o'=>'FastCGIEngineContrib.tgz' => 'FastCGIEngineContrib.tgz.uuencode' );
+	DEBUG( "contrib uudecoded" );
 	# SMELL: test for error from uudecode
 	unlink 'FastCGIEngineContrib.tgz.uuencode';
 
