@@ -313,7 +313,7 @@ __LIB_LOCALSITE_CFG__
 my $configure = "http://$DefaultUrlHost$foswiki_url/bin/configure";
 
 print "\nYou *MUST* perform a *SAVE* at $configure to complete the installation of your wiki.\nEnjoy!\n";
-system( lynx => $configure );
+#system( lynx => $configure );
 
 exit 0;
 
