@@ -300,6 +300,8 @@ my $libLocalSiteCfg = <<__LIB_LOCALSITE_CFG__;
 \$Foswiki::cfg{ScriptSuffix} = '';
 \$Foswiki::cfg{WebMasterEmail} = '$WikiWebMasterEmail';
 \$Foswiki::cfg{Password} = '$encrypted_password';
+\$Foswiki::cfg{ScriptDir} = '$foswiki_root/bin';
+\$Foswiki::cfg{ToolsDir} = '$foswiki_root/tools';
 1;
 __LIB_LOCALSITE_CFG__
 

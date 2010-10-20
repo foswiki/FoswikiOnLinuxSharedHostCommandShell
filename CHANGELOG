@@ -2,12 +2,13 @@ CHANGELOG
 
 2010-10-04  1.1.0-1
    * Updated to Foswiki 1.1.0
+   * Reduced memory usage by shelling out to tar, uudecode, etc.  Dreamhost was killing the process due to "excessive memory use"
 
 2010-10-03  1.0.10-3
    * Improve regex for Expires header - match jpeg as well as jpg. -- Foswiki:Main.WillNorris; match the gz compressed versions of css and js -- Foswiki:Main.GeorgeClark
 
 2010-09-29  1.0.10.-2
-   * Switched from mod_fastci to mod_fcgid
+   * Switched from mod_fastci to mod_fcgid.  Marked improvement on Dreamhost (no more blank pages).
 
 2010-09-29  1.0.10.-1
    * Updated to Foswiki 1.0.10
