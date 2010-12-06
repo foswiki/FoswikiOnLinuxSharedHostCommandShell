@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # Copyright (c) 2010, Will Norris.  Licensed under the GPLv2.
-# Version 1.1.0-1 - 19 Oct 2010
+# Version 1.1.2-1 - 19 Oct 2010
 use strict;
 use warnings;
 use Data::Dumper qw( Dumper );
@@ -32,7 +32,7 @@ DEBUG( "foswiki_root=[$foswiki_root]" );
 # welcome banner
 unless ( $opts->{hostname} and $opts->{email} ) {
     print <<__WELCOME__;
-This script will install Foswiki v1.1.0 to "$pwd"
+This script will install Foswiki v1.1.2 to "$pwd"
 The following information will be needed:
 1. domain name
    * (optional) a separate subdomain for pub
