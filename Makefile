@@ -29,10 +29,10 @@ $(INSTALLER_SCRIPT_FILENAME).md5 : $(INSTALLER_SCRIPT_FILENAME)
 	md5sum $(INSTALLER_SCRIPT_FILENAME) >$(INSTALLER_SCRIPT_FILENAME).md5
 
 $(FOSWIKI_BASE_FILENAME).tgz.uuencode : $(FOSWIKI_BASE_FILENAME).tgz
-	perl -Ilib/CPAN/lib/ puuencode $(FOSWIKI_BASE_FILENAME).tgz >$(FOSWIKI_BASE_FILENAME).tgz.uuencode
+	perl -Ilib/CPAN/lib/ tools/puuencode $(FOSWIKI_BASE_FILENAME).tgz >$(FOSWIKI_BASE_FILENAME).tgz.uuencode
 
 FastCGIEngineContrib.tgz.uuencode : FastCGIEngineContrib.tgz
-	perl -Ilib/CPAN/lib/ puuencode FastCGIEngineContrib.tgz >FastCGIEngineContrib.tgz.uuencode
+	perl -Ilib/CPAN/lib/ tools/puuencode FastCGIEngineContrib.tgz >FastCGIEngineContrib.tgz.uuencode
 
 $(FOSWIKI_BASE_FILENAME).tgz :
 	wget -O $(FOSWIKI_BASE_FILENAME).tgz 'http://sourceforge.net/projects/foswiki/files/foswiki/$(FOSWIKI_RELEASE)/$(FOSWIKI_BASE_FILENAME).tgz/download'
