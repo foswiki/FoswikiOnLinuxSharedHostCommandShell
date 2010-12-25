@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Data::Dumper qw( Dumper );
 
+my $OFFER_SEPARATE_PUB = 0;
+
 ################################################################################
 use Getopt::Long;
 GetOptions( my $opts = {},
@@ -35,7 +37,6 @@ unless ( $opts->{hostname} and $opts->{email} ) {
 This script will install Foswiki v1.1.2 to "$pwd"
 The following information will be needed:
 1. domain name
-   * (optional) a separate subdomain for pub
 2. wiki webmaster email address
 __WELCOME__
 }
@@ -68,7 +69,7 @@ if ( $opts->{puburl} ) {
     ;# default PubUrlPath is a fine default when hostname specified, but puburl not
 } else {
     # optional pub content subdomain
-    if ( $#{ [split /\./, $DefaultUrlHost]} >= 2 ) {	# subdomain.example.com == 2
+    if ( $OFFER_SEPARATE_PUB && $#{ [split /\./, $DefaultUrlHost]} >= 2 ) {	# subdomain.example.com == 2
 	print "Do you want to specify a separate domain for pub? (y/n): ";
 	chomp( my $pub_subdomain_q = <STDIN> );
 	if ( $pub_subdomain_q =~ /^y/i ) {
