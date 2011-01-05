@@ -8,6 +8,13 @@ INSTALLER_SCRIPT_FILENAME = $(FOSWIKI_BASE_FILENAME)-SharedHosting-$(INSTALLER_S
 
 default : foswiki-install-shared-hosting.pl
 
+help :
+	@echo foswiki-install-shared-hosting.pl
+	@echo release
+	@echo clean
+	@echo realclean
+	@echo $(INSTALLER_SCRIPT_FILENAME).md5
+
 RELEASE_FILES = $(INSTALLER_SCRIPT_FILENAME) $(INSTALLER_SCRIPT_FILENAME).md5
 release : $(RELEASE_FILES)
 
