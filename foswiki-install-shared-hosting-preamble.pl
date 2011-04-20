@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # Copyright (c) 2010, Will Norris.  Licensed under the GPLv2.
-# Version 1.1.2-1 - 19 Oct 2010
+# Version 1.1.3 - 20 Apr 2011
 use strict;
 use warnings;
 use Data::Dumper qw( Dumper );
@@ -34,7 +34,7 @@ DEBUG( "foswiki_root=[$foswiki_root]" );
 # welcome banner
 unless ( $opts->{hostname} and $opts->{email} ) {
     print <<__WELCOME__;
-This script will install Foswiki v1.1.2 to "$pwd"
+This script will install Foswiki v1.1.3 to "$pwd"
 The following information will be needed:
 1. domain name
 2. wiki webmaster email address
@@ -171,6 +171,7 @@ unless ( -e "$foswiki_root/.htaccess" ) {
     system( cp => "$foswiki_root/root-htaccess.txt" => "$foswiki_root/.htaccess" );
     system( chmod => 'u+w' => "$foswiki_root/.htaccess" );
     open( FH, '>>', "$foswiki_root/.htaccess" ) or die $!;
+    print FH "Options -Indexes", "\n";
     print FH "Redirect $foswiki_url/index.html http://$DefaultUrlHost$foswiki_url/bin/view", "\n";
     close( FH );
     system( chmod => 'u-w' => "$foswiki_root/.htaccess" );
@@ -223,16 +224,8 @@ unless ( -e "$foswiki_root/bin/.htaccess" ) {
 </ifmodule>
 __FASTCGI__
 
-    my $compress = <<'__DEFLATE__';
-<ifmodule mod_deflate.c>
-    SetOutputFilter DEFLATE
-    AddOutputFilterByType DEFLATE text/html application/xhtml+xml application/xml text/plain text/xml
-</ifmodule>
-__DEFLATE__
-
     open( FH, '>>', "$foswiki_root/bin/.htaccess" ) or die $!;
     print FH $fastcgi;
-    print FH $compress;
     close( FH );
 }
 
@@ -251,8 +244,9 @@ unless ( -e "$foswiki_root/pub/.htaccess" ) {
    </filesmatch>
 </ifmodule>
 <ifmodule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/css application/x-javascript application/javascript 
+    AddOutputFilterByType DEFLATE text/css application/x-javascript application/javascript text/html application/xhtml+xml application/xml text/plain text/xml
 </ifmodule>
+FileETag MTime Size
 __MOD_DEFLATE__
 
     system( chmod => 'u+w' => "$foswiki_root/pub/.htaccess" );
@@ -373,8 +367,7 @@ sub generate_password {
 sub _encode_password {
     my $pass = shift;
     my @saltchars = ( 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '.', '/' );
-    # SMELL: why not simple length instead of $# + 1 ?
-    my $salt = $saltchars[ int( rand( $#saltchars + 1 ) ) ] . $saltchars[ int( rand( $#saltchars + 1 ) ) ];
+    my $salt = $saltchars[ int( rand( scalar @saltchars ) ) ] . $saltchars[ int( rand( scalar @saltchars ) ) ];
     return crypt( $pass, $salt );
 }
 
@@ -395,12 +388,12 @@ sub DEBUG {
 #   * support ShortURLs
 #   * perform the initial configure save via this script (STUCK)
 #   * use Apache::Htpasswd (which also means i don't have to look for htpasswd or htpasswd2)
-#   * use WWW::Mechanize::Foswiki to drive configure
 #   * provide CPAN installation support
 #   * add "Cache-Control: private" and "KeepAlive on" (http://www.die.net/musings/page_load_time/) to pub/.htaccess ?
 #   * ability to disable mod_deflate support on pub (better to serve the raw file instead of trying to compress it on an overloaded shared host?)
 #   * test and support (better) https
 #   * trivial browser frontend for ftp installation
+#   * use WWW::Mechanize::Foswiki to drive configure (?)
 ################################################################################
 # NOTES:
 #   * http://cgipan.cvs.sourceforge.net/cgipan/cgipan/cgipan.cgi?view=markup
