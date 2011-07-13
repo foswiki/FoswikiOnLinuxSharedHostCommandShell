@@ -9,26 +9,29 @@ my $OFFER_SEPARATE_PUB = 0;
 
 ################################################################################
 use Getopt::Long;
-GetOptions( my $opts = {},
-	    'verbose',
-	    'debug',
-	    'admin=s',
-	    'hostname=s',
-	    'puburl=s',
-	    'email=s',	# email@example.com
-	    );
+GetOptions(
+    my $opts = {},
+    'verbose',
+    'debug',
+    'admin=s',
+    'hostname=s',
+    'puburl=s',
+    'email=s',    # email@example.com
+);
+
 #print "VERBOSE=[$opts->{verbose}], DEBUG=[$opts->{debug}]\n";
 ################################################################################
 
 chomp( my $pwd = `pwd` );
+
 # dreamhost-specific: remove symlink in /home/.symlink-to-actual-drive/account/...
 # otherwise, this can cause problems if they move your account to different attached storage
 # NOTE: this is benign on systems that don't use this format of .filename symlinks
 $pwd =~ s{^(/home)/\..+?(/.+)}{$1$2};
-DEBUG( "pwd=[$pwd]" );
+DEBUG("pwd=[$pwd]");
 
 my $foswiki_root = $pwd;
-DEBUG( "foswiki_root=[$foswiki_root]" );
+DEBUG("foswiki_root=[$foswiki_root]");
 
 ################################################################################
 # welcome banner
@@ -47,90 +50,118 @@ my ( $DefaultUrlHost, $foswiki_url );
 if ( $opts->{hostname} ) {
     $DefaultUrlHost = $opts->{hostname};
     ( undef, $foswiki_url ) = $pwd =~ m{^/home/[^/]+/([^/]+)(.*)};
-} else {
+}
+else {
     print "\n1. Domain name\n";
     ( $DefaultUrlHost, $foswiki_url ) = $pwd =~ m{^/home/[^/]+/([^/]+)(.*)};
-    DEBUG( "DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]" );
-    # prepend "www." if we're not in a subdomain (eg, example.com instead of wiki.example.com or www.example.com)
-    if ( $#{ [split /\./, $DefaultUrlHost]} == 1 ) {
-	print "Domain name: \"www.\" automatically prepended.  Although you aren't required to locate the wiki in a subdomain, doing so will allow you to later\ncreate another subdomain to serve the static content from pub, improving page load performance.\n(see http://developer.yahoo.com/performance/rules.html#cookie_free)\n";
-	$DefaultUrlHost = "www.$DefaultUrlHost";
+    DEBUG("DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]");
+
+# prepend "www." if we're not in a subdomain (eg, example.com instead of wiki.example.com or www.example.com)
+    if ( $#{ [ split /\./, $DefaultUrlHost ] } == 1 ) {
+        print
+"Domain name: \"www.\" automatically prepended.  Although you aren't required to locate the wiki in a subdomain, doing so will allow you to later\ncreate another subdomain to serve the static content from pub, improving page load performance.\n(see http://developer.yahoo.com/performance/rules.html#cookie_free)\n";
+        $DefaultUrlHost = "www.$DefaultUrlHost";
     }
-    DEBUG( "DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]" );
-    print "Domain name guessed; press ENTER to accept or enter a new value to override ($DefaultUrlHost): ";
+    DEBUG("DefaultUrlHost=[$DefaultUrlHost], foswiki_url=[$foswiki_url]");
+    print
+"Domain name guessed; press ENTER to accept or enter a new value to override ($DefaultUrlHost): ";
     chomp( my $user_hostname = <STDIN> );
     $DefaultUrlHost = $user_hostname if length $user_hostname;
 }
 
-my $PubUrlPath = "$foswiki_url/pub";	# /foswiki/pub, pub.example.com
+my $PubUrlPath = "$foswiki_url/pub";    # /foswiki/pub, pub.example.com
 if ( $opts->{puburl} ) {
     $PubUrlPath = $opts->{puburl};
-} elsif ( $opts->{hostname} ) {
-    ;# default PubUrlPath is a fine default when hostname specified, but puburl not
-} else {
+}
+elsif ( $opts->{hostname} ) {
+    ; # default PubUrlPath is a fine default when hostname specified, but puburl not
+}
+else {
+
     # optional pub content subdomain
-    if ( $OFFER_SEPARATE_PUB && $#{ [split /\./, $DefaultUrlHost]} >= 2 ) {	# subdomain.example.com == 2
-	print "Do you want to specify a separate domain for pub? (y/n): ";
-	chomp( my $pub_subdomain_q = <STDIN> );
-	if ( $pub_subdomain_q =~ /^y/i ) {
+    if ( $OFFER_SEPARATE_PUB && $#{ [ split /\./, $DefaultUrlHost ] } >= 2 )
+    {    # subdomain.example.com == 2
+        print "Do you want to specify a separate domain for pub? (y/n): ";
+        chomp( my $pub_subdomain_q = <STDIN> );
+        if ( $pub_subdomain_q =~ /^y/i ) {
+
 #            $PubUrlPath = my $pub_subdomain_default = join( '.', 'pub', (split( /\./, $DefaultUrlHost ))[1,1e6] );	# strip off first subdomain, replace with "pub"
-	    $PubUrlPath = my $pub_subdomain_default = join( '.', 'pub', eval { my @a = split( /\./, $DefaultUrlHost ); shift @a; return @a } );
-	    DEBUG( "pub_subdomain_default=[$pub_subdomain_default]" );
-	    print "Enter pub subdomain ($pub_subdomain_default): ";
-	    chomp( my $pub_subdomain_prompt = <STDIN> );
-	    DEBUG( "pub_subdomain_prompt=[$pub_subdomain_prompt]" );
-	    $PubUrlPath = $pub_subdomain_prompt if length $pub_subdomain_prompt;
-	    DEBUG( "PubUrlPath=[$PubUrlPath]" );
-	    $PubUrlPath = "http://$PubUrlPath" unless $PubUrlPath =~ m{^https?://};
-	    DEBUG( "PubUrlPath=[$PubUrlPath]" );
-	}
+            $PubUrlPath = my $pub_subdomain_default = join(
+                '.', 'pub',
+                eval {
+                    my @a = split( /\./, $DefaultUrlHost );
+                    shift @a;
+                    return @a;
+                }
+            );
+            DEBUG("pub_subdomain_default=[$pub_subdomain_default]");
+            print "Enter pub subdomain ($pub_subdomain_default): ";
+            chomp( my $pub_subdomain_prompt = <STDIN> );
+            DEBUG("pub_subdomain_prompt=[$pub_subdomain_prompt]");
+            $PubUrlPath = $pub_subdomain_prompt if length $pub_subdomain_prompt;
+            DEBUG("PubUrlPath=[$PubUrlPath]");
+            $PubUrlPath = "http://$PubUrlPath"
+              unless $PubUrlPath =~ m{^https?://};
+            DEBUG("PubUrlPath=[$PubUrlPath]");
+        }
     }
 }
+
 # TOOO: create pub directory now so that people can create the pub subdomain?
 
-my $DataDir = $foswiki_root . '/data';
+my $DataDir       = $foswiki_root . '/data';
 my $ScriptUrlPath = "$foswiki_url/bin";
 
 ################################################################################
 # extract and uudecode the embedded files, make available by index and name
 my $data = join( '', <main::DATA> );
-my @archive = ( $data =~ /(begin 0?\d{3}.*?end)/gs );		# SMELL: regex could be tighter
+my @archive =
+  ( $data =~ /(begin 0?\d{3}.*?end)/gs );    # SMELL: regex could be tighter
 $data = undef;
+
 #die "wrong number of archives (" . scalar(@archive) . "); should be 2" if scalar @archive != 2;
-my %archive = map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) } @archive;	# make accessible via hash keyed by 'name'
+my %archive =
+  map { /^begin\s+0?\d{3}\s+(.+?)\n/; ( $1 => $_ ) }
+  @archive;    # make accessible via hash keyed by 'name'
 
 ################################################################################
 # extract the foswiki distribution
 unless ( -e "$foswiki_root/bin/view" ) {
     my $foswiki_distribution = $archive[0];
 
-    VERBOSE( "Decompressing Foswiki" );
-    if ( 0 ) {
-	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $foswiki_distribution );	# use first slot which should contain a Foswiki distribution
-	DEBUG( "Foswiki uudecoded" );
-	$foswiki_distribution = $archive[0] = undef;
+    VERBOSE("Decompressing Foswiki");
+    if (0) {
+        my ( $uudecoded_string, $name, $mode ) =
+          Convert::UU::uudecode($foswiki_distribution)
+          ;    # use first slot which should contain a Foswiki distribution
+        DEBUG("Foswiki uudecoded");
+        $foswiki_distribution = $archive[0] = undef;
 
-	open( TAR, '>', 'Foswiki.tgz' ) or die $!;
-	print TAR $uudecoded_string;
-	close TAR;
-	$uudecoded_string = undef;
-	
-    } else {
+        open( TAR, '>', 'Foswiki.tgz' ) or die $!;
+        print TAR $uudecoded_string;
+        close TAR;
+        $uudecoded_string = undef;
 
-	DEBUG( "saving Foswiki distribution tgz" );
-	open( UU, '>', 'Foswiki.tgz.uuencode' ) or die $!;
-	print UU $foswiki_distribution, "\n";
-	close UU;
-	$foswiki_distribution = $archive[0] = undef;  @archive = ();
+    }
+    else {
 
-	DEBUG( "uudecodeding Foswiki" );
-	system( uudecode => '-o'=>'Foswiki.tgz' => 'Foswiki.tgz.uuencode' );
-	DEBUG( "Foswiki uudecoded" );
-	# SMELL: test for error from uudecode
-	unlink 'Foswiki.tgz.uuencode';
+        DEBUG("saving Foswiki distribution tgz");
+        open( UU, '>', 'Foswiki.tgz.uuencode' ) or die $!;
+        print UU $foswiki_distribution, "\n";
+        close UU;
+        $foswiki_distribution = $archive[0] = undef;
+        @archive = ();
+
+        DEBUG("uudecodeding Foswiki");
+        system( uudecode => '-o' => 'Foswiki.tgz' => 'Foswiki.tgz.uuencode' );
+        DEBUG("Foswiki uudecoded");
+
+        # SMELL: test for error from uudecode
+        unlink 'Foswiki.tgz.uuencode';
     }
 
-    system( tar => '--strip'=>'1' => '-xzf' => 'Foswiki.tgz' );
+    system( tar => '--strip' => '1' => '-xzf' => 'Foswiki.tgz' );
+
     # SMELL: test for error from tar
     unlink 'Foswiki.tgz';
 
@@ -139,24 +170,35 @@ unless ( -e "$foswiki_root/bin/view" ) {
 ################################################################################
 # bin/LocalLib.cfg
 unless ( -e "$foswiki_root/bin/LocalLib.cfg" ) {
-    VERBOSE( "Creating bin/LocalLib.cfg" );
-    system( cp => "$foswiki_root/bin/LocalLib.cfg.txt" => "$foswiki_root/bin/LocalLib.cfg" )
+    VERBOSE("Creating bin/LocalLib.cfg");
+    system( cp => "$foswiki_root/bin/LocalLib.cfg.txt" =>
+          "$foswiki_root/bin/LocalLib.cfg" );
 }
-system( qq{sed -i -e 's|/absolute/path/to/your/lib|$foswiki_root/lib|' $foswiki_root/bin/LocalLib.cfg} );
+system(
+qq{sed -i -e 's|/absolute/path/to/your/lib|$foswiki_root/lib|' $foswiki_root/bin/LocalLib.cfg}
+);
 
 my $password = generate_password();
-DEBUG( "password=[$password]" );
+DEBUG("password=[$password]");
 
 ################################################################################
 # .htpasswd
 my $Administrators = $opts->{admin} || 'admin';
 my $htpasswd_file = "$foswiki_root/data/.htpasswd";
+
 # SMELL - could be better, like checking for $Administrators in the password file
 unless ( -e $htpasswd_file ) {
-    print "Creating data/.htpasswd and setting the password to access configure\n";
+    print
+      "Creating data/.htpasswd and setting the password to access configure\n";
 
-    print "A secure password for configure (access and save) has been generated for you: >>>>> $password <<<<<\n";
-    system( htpasswd => '-b', '-c' => $htpasswd_file, $Administrators, $password );
+    print
+"A secure password for configure (access and save) has been generated for you: >>>>> $password <<<<<\n";
+    system(
+        htpasswd => '-b',
+        '-c'     => $htpasswd_file,
+        $Administrators, $password
+    );
+
     # TODO: use Apache::Htpasswd
     # my $htpasswd = new Apache::Htpasswd( $htpasswd_file );
     # $htpasswd->htpasswd( $Administrators, $password, { overwrite => 1 } );
@@ -167,13 +209,18 @@ unless ( -e $htpasswd_file ) {
 ################################################################################
 # foswiki root .htaccess
 unless ( -e "$foswiki_root/.htaccess" ) {
-    VERBOSE( "Creating foswiki root .htaccess (with redirect from the foswiki root directory to the wiki itself)" );
-    system( cp => "$foswiki_root/root-htaccess.txt" => "$foswiki_root/.htaccess" );
+    VERBOSE(
+"Creating foswiki root .htaccess (with redirect from the foswiki root directory to the wiki itself)"
+    );
+    system(
+        cp => "$foswiki_root/root-htaccess.txt" => "$foswiki_root/.htaccess" );
     system( chmod => 'u+w' => "$foswiki_root/.htaccess" );
     open( FH, '>>', "$foswiki_root/.htaccess" ) or die $!;
     print FH "Options -Indexes", "\n";
-    print FH "Redirect $foswiki_url/index.html http://$DefaultUrlHost$foswiki_url/bin/view", "\n";
-    close( FH );
+    print FH
+"Redirect $foswiki_url/index.html http://$DefaultUrlHost$foswiki_url/bin/view",
+      "\n";
+    close(FH);
     system( chmod => 'u-w' => "$foswiki_root/.htaccess" );
 }
 
@@ -182,36 +229,51 @@ unless ( -e "$foswiki_root/.htaccess" ) {
 # enables FastCGI (if available) as well as mod_deflate (if available)
 # it is questionable whether it is better to enable mod_deflate on an overloaded shared system or not :/
 unless ( -e "$foswiki_root/bin/.htaccess" ) {
-    VERBOSE( "Creating bin/.htaccess (including FastCGI and mod_deflate support)" );
-    system( cp => "$foswiki_root/bin/.htaccess.txt" => "$foswiki_root/bin/.htaccess" );
-    system( qq{sed -i -e 's|\{DataDir\}|$DataDir|g' $foswiki_root/bin/.htaccess} );
-    system( qq{sed -i -e 's|\{DefaultUrlHost\}|$DefaultUrlHost|g' $foswiki_root/bin/.htaccess} );
-    system( qq{sed -i -e 's|\{ScriptUrlPath\}|$ScriptUrlPath|g' $foswiki_root/bin/.htaccess} );
-    system( qq{sed -i -e 's|\{Administrators\}|$Administrators|g' $foswiki_root/bin/.htaccess} );
+    VERBOSE(
+        "Creating bin/.htaccess (including FastCGI and mod_deflate support)");
+    system( cp => "$foswiki_root/bin/.htaccess.txt" =>
+          "$foswiki_root/bin/.htaccess" );
+    system(
+        qq{sed -i -e 's|\{DataDir\}|$DataDir|g' $foswiki_root/bin/.htaccess});
+    system(
+qq{sed -i -e 's|\{DefaultUrlHost\}|$DefaultUrlHost|g' $foswiki_root/bin/.htaccess}
+    );
+    system(
+qq{sed -i -e 's|\{ScriptUrlPath\}|$ScriptUrlPath|g' $foswiki_root/bin/.htaccess}
+    );
+    system(
+qq{sed -i -e 's|\{Administrators\}|$Administrators|g' $foswiki_root/bin/.htaccess}
+    );
 
-    VERBOSE( "Decompressing FastCGIEngineContrib" );
-    if ( 0 ) {
-	my ($uudecoded_string,$name,$mode) = Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
-	$archive{'FastCGIEngineContrib.tgz'} = undef;
-	open( TAR, '|-', tar => '-xz' );
-	print TAR $uudecoded_string;
-	close TAR;
-	# SMELL: test for error from tar
-    } else {
-	open( UU, '>', 'FastCGIEngineContrib.tgz.uuencode' ) or die $!;
-	print UU $archive{'FastCGIEngineContrib.tgz'}, "\n";
-	close UU;
-	$archive{'FastCGIEngineContrib.tgz'} = undef;
+    VERBOSE("Decompressing FastCGIEngineContrib");
+    if (0) {
+        my ( $uudecoded_string, $name, $mode ) =
+          Convert::UU::uudecode( $archive{'FastCGIEngineContrib.tgz'} );
+        $archive{'FastCGIEngineContrib.tgz'} = undef;
+        open( TAR, '|-', tar => '-xz' );
+        print TAR $uudecoded_string;
+        close TAR;
 
-	DEBUG( "uudecodeding contrib" );
-	system( uudecode => '-o'=>'FastCGIEngineContrib.tgz' => 'FastCGIEngineContrib.tgz.uuencode' );
-	DEBUG( "contrib uudecoded" );
-	# SMELL: test for error from uudecode
-	unlink 'FastCGIEngineContrib.tgz.uuencode';
+        # SMELL: test for error from tar
+    }
+    else {
+        open( UU, '>', 'FastCGIEngineContrib.tgz.uuencode' ) or die $!;
+        print UU $archive{'FastCGIEngineContrib.tgz'}, "\n";
+        close UU;
+        $archive{'FastCGIEngineContrib.tgz'} = undef;
 
-	system( tar => '-xzf' => 'FastCGIEngineContrib.tgz' );
-	# SMELL: test for error from tar
-	unlink 'FastCGIEngineContrib.tgz';
+        DEBUG("uudecodeding contrib");
+        system( uudecode => '-o' => 'FastCGIEngineContrib.tgz' =>
+              'FastCGIEngineContrib.tgz.uuencode' );
+        DEBUG("contrib uudecoded");
+
+        # SMELL: test for error from uudecode
+        unlink 'FastCGIEngineContrib.tgz.uuencode';
+
+        system( tar => '-xzf' => 'FastCGIEngineContrib.tgz' );
+
+        # SMELL: test for error from tar
+        unlink 'FastCGIEngineContrib.tgz';
     }
 
     my $fastcgi = <<'__FASTCGI__';
@@ -226,15 +288,20 @@ __FASTCGI__
 
     open( FH, '>>', "$foswiki_root/bin/.htaccess" ) or die $!;
     print FH $fastcgi;
-    close( FH );
+    close(FH);
 }
 
 ################################################################################
 # pub/.htaccess
 unless ( -e "$foswiki_root/pub/.htaccess" ) {
-    VERBOSE( "Creating pub/.htaccess (including mod_expire and mod_deflate support)" );
-    system( cp => "$foswiki_root/pub-htaccess.txt" => "$foswiki_root/pub/.htaccess" );
-    system( qq{sed -i -e 's|/foswiki/bin/viewfile|$foswiki_url/bin/viewfile|' $foswiki_root/pub/.htaccess} );
+    VERBOSE(
+        "Creating pub/.htaccess (including mod_expire and mod_deflate support)"
+    );
+    system( cp => "$foswiki_root/pub-htaccess.txt" =>
+          "$foswiki_root/pub/.htaccess" );
+    system(
+qq{sed -i -e 's|/foswiki/bin/viewfile|$foswiki_url/bin/viewfile|' $foswiki_root/pub/.htaccess}
+    );
 
     my $compress = <<'__MOD_DEFLATE__';
 <ifmodule mod_expires.c>
@@ -252,7 +319,7 @@ __MOD_DEFLATE__
     system( chmod => 'u+w' => "$foswiki_root/pub/.htaccess" );
     open( FH, '>>', "$foswiki_root/pub/.htaccess" ) or die $!;
     print FH $compress;
-    close( FH );
+    close(FH);
     system( chmod => 'u-w' => "$foswiki_root/pub/.htaccess" );
 }
 
@@ -260,29 +327,31 @@ __MOD_DEFLATE__
 # .htaccess in the remaining directories: data, lib, locale, templates, tools, working
 foreach my $subdir (qw( data lib locale templates tools working )) {
     unless ( -e "$foswiki_root/$subdir/.htaccess" ) {
-        VERBOSE( "Creating $subdir/.htaccess to deny access" );
-        system( cp => "$foswiki_root/subdir-htaccess.txt" => "$foswiki_root/$subdir/.htaccess" );
+        VERBOSE("Creating $subdir/.htaccess to deny access");
+        system( cp => "$foswiki_root/subdir-htaccess.txt" =>
+              "$foswiki_root/$subdir/.htaccess" );
     }
 }
 
 ################################################################################
 # lib/LocalSite.cfg
-my $WikiWebMasterEmail;	# email@example.com
+my $WikiWebMasterEmail;    # email@example.com
 unless ( -e "$foswiki_root/lib/LocalSite.cfg" ) {
-    VERBOSE( "Performing final Foswiki configuration" );
+    VERBOSE("Performing final Foswiki configuration");
 
-    my $encrypted_password = _encode_password( $password );
+    my $encrypted_password = _encode_password($password);
     if ( $opts->{email} ) {
         $WikiWebMasterEmail = $opts->{email};
-    } else {
+    }
+    else {
         print "\n2. Wiki webmaster email address (required for registration): ";
         chomp( $WikiWebMasterEmail = <STDIN> );
     }
 
-# lib/LocalSite.cfg
-Autoconf( $foswiki_root );
+    # lib/LocalSite.cfg
+    Autoconf($foswiki_root);
 
-my $libLocalSiteCfg = <<__LIB_LOCALSITE_CFG__;
+    my $libLocalSiteCfg = <<__LIB_LOCALSITE_CFG__;
 # Local site settings for Foswiki. This file is managed by the 'configure'
 # CGI script, though you can also make (careful!) manual changes with a
 # text editor.
@@ -305,7 +374,7 @@ __LIB_LOCALSITE_CFG__
 
     open( FH, '>>', "$foswiki_root/lib/LocalSite.cfg" ) or die $!;
     print FH $libLocalSiteCfg;
-    close( FH );
+    close(FH);
 }
 
 ################################################################################
@@ -321,7 +390,7 @@ sub error {
 }
 
 sub Autoconf {
-    my ( $foswikidir ) = @_;
+    my ($foswikidir) = @_;
     my $force = 1;
 
     my $localSiteCfg = $foswikidir . '/lib/LocalSite.cfg';
@@ -342,6 +411,7 @@ sub Autoconf {
         if ( open( my $ls, '>', $localSiteCfg ) ) {
             print $ls $localsite;
             close $ls;
+
             #warn "wrote simple config to $localSiteCfg\n\n";
         }
         else {
@@ -358,8 +428,17 @@ sub Autoconf {
 # same as standard settings for http://goodpassword.com
 sub generate_password {
     my $length = 12;
-    my $valid_password_chars = q|23456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ|;
-    my $password = join( '', ( map { substr( $valid_password_chars, int( rand length $valid_password_chars ), 1 ) } ( 1..$length ) ) );
+    my $valid_password_chars =
+      q|23456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ|;
+    my $password = join(
+        '',
+        (
+            map {
+                substr( $valid_password_chars,
+                    int( rand length $valid_password_chars ), 1 )
+              } ( 1 .. $length )
+        )
+    );
     return $password;
 }
 
@@ -367,7 +446,9 @@ sub generate_password {
 sub _encode_password {
     my $pass = shift;
     my @saltchars = ( 'a' .. 'z', 'A' .. 'Z', '0' .. '9', '.', '/' );
-    my $salt = $saltchars[ int( rand( scalar @saltchars ) ) ] . $saltchars[ int( rand( scalar @saltchars ) ) ];
+    my $salt =
+        $saltchars[ int( rand( scalar @saltchars ) ) ]
+      . $saltchars[ int( rand( scalar @saltchars ) ) ];
     return crypt( $pass, $salt );
 }
 
@@ -408,5 +489,4 @@ sub DEBUG {
 ## EOF - foswiki-install-shared-hosting-preamble.pl
 ################################################################################
 ################################################################################
-
 
