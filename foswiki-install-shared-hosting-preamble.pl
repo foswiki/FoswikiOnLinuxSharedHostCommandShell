@@ -258,7 +258,7 @@ __MOD_DEFLATE__
 
 ################################################################################
 # .htaccess in the remaining directories: data, lib, locale, templates, tools, working
-foreach my $subdir qw( data lib locale templates tools working ) {
+foreach my $subdir (qw( data lib locale templates tools working )) {
     unless ( -e "$foswiki_root/$subdir/.htaccess" ) {
         VERBOSE( "Creating $subdir/.htaccess to deny access" );
         system( cp => "$foswiki_root/subdir-htaccess.txt" => "$foswiki_root/$subdir/.htaccess" );
